@@ -720,7 +720,20 @@ def fhost():
 
         abort(400)
     else:
-        return render_template("index.html")
+        return render_template("index.html", files=File.query.all())
+
+
+@app.route("/clipboard", methods=["GET", "POST"])
+def clipboard():
+    clipboard_path = Path(app.config["FHOST_STORAGE_PATH"]) / "clipboard.txt"
+    if request.method == "POST":
+        clipboard_path.write_text(request.get_data(as_text=True))
+        return "", 204
+    else:
+        if clipboard_path.exists():
+            return clipboard_path.read_text()
+        else:
+            return ""
 
 
 @app.route("/robots.txt")

@@ -1,4 +1,47 @@
-<pre>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>0x0</title>
+</head>
+<body>
+    <h1>Clipboard</h1>
+    <textarea id="clipboard" style="width: 100%; height: 150px;"></textarea>
+
+    <br>
+
+    <h1>Files</h1>
+    <form action="/" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" required>
+        <button type="submit">Upload</button>
+    </form>
+
+    <br>
+
+    <table border="1" style="border-collapse: collapse; width: 100%;">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Size</th>
+                <th>MIME Type</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for file in files %}
+            <tr>
+                <td><a href="{{ file.geturl() }}">{{ file.filename }}</a></td>
+                <td>{{ file.size|filesizeformat(True) }}</td>
+                <td>{{ file.mime }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <br>
+
+    <div class="original-content">
+        <pre>
 THE NULL POINTER
 ================
 {% set fhost_url = url_for("fhost", _external=True).rstrip("/") %}
@@ -65,4 +108,26 @@ retention = min_age + (-max_age + min_age) * pow((file_size / max_size - 1), 3)
  {{'{: 6}'.format(config.get("FHOST_MIN_EXPIRATION", 2592000000)//86400000)}} |                                    ....................
           0{{ ((config["MAX_CONTENT_LENGTH"]/2)|filesizeformat(True)).split(" ")[0].rjust(27) }}{{ max_size.split(" ")[0].rjust(27) }}
            {{ max_size.split(" ")[1].rjust(54) }}
-</pre>
+        </pre>
+    </div>
+
+    <script>
+        const clipboard = document.getElementById('clipboard');
+        let timeout;
+
+        fetch('/clipboard')
+            .then(response => response.text())
+            .then(text => clipboard.value = text);
+
+        clipboard.addEventListener('input', () => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                fetch('/clipboard', {
+                    method: 'POST',
+                    body: clipboard.value
+                });
+            }, 300);
+        });
+    </script>
+</body>
+</html>
