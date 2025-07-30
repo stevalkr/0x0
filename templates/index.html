@@ -23,6 +23,7 @@
         <thead>
             <tr>
                 <th>Name</th>
+                <th>File Name</th>
                 <th>Size</th>
                 <th>MIME Type</th>
             </tr>
@@ -30,7 +31,8 @@
         <tbody>
             {% for file in files %}
             <tr>
-                <td><a href="{{ file.geturl() }}">{{ file.filename }}</a></td>
+                <td><a href="{{ file.geturl() }}">{{ file.getname() }}</a></td>
+                <td>{{ file.filename }}</td>
                 <td>{{ file.size|filesizeformat(True) }}</td>
                 <td>{{ file.mime }}</td>
             </tr>
