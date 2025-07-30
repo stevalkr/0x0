@@ -26,3 +26,4 @@ python-mpv
 
 # dev
 pytest
+uwsgi

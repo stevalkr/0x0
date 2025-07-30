@@ -231,6 +231,7 @@ class File(db.Model):
     secret = db.Column(db.String)
     last_vscan = db.Column(db.DateTime)
     size = db.Column(db.BigInteger)
+    filename = db.Column(db.UnicodeText)
 
     def __init__(self, file_: TransferFile, addr, ua, expiration, mgmt_token):
         self.sha256 = file_.sha256
@@ -240,6 +241,7 @@ class File(db.Model):
         self.ua = ua
         self.expiration = expiration
         self.mgmt_token = mgmt_token
+        self.filename = file_.name
 
     @property
     def is_nsfw(self) -> bool:
@@ -254,7 +256,12 @@ class File(db.Model):
         n = self.getname()
         a = "nsfw" if self.is_nsfw else None
 
-        return url_for("get", path=n, secret=self.secret,
+        if self.filename:
+            path = f"{n}/{self.filename}"
+        else:
+            path = n
+
+        return url_for("get", path=path, secret=self.secret,
                        _external=True, _anchor=a) + "\n"
 
     def getpath(self) -> Path:
